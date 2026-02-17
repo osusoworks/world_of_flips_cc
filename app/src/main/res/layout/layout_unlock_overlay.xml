@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/unlockOverlayRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="gone"
+    android:elevation="10dp">
+
+    <!-- Flash overlay (white background) -->
+    <View
+        android:id="@+id/flashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:alpha="0" />
+
+    <!-- Semi-transparent background -->
+    <View
+        android:id="@+id/dimBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:alpha="0" />
+
+    <!-- Container for unlock content -->
+    <LinearLayout
+        android:id="@+id/unlockContentContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:alpha="0">
+
+        <!-- Unlock image -->
+        <ImageView
+            android:id="@+id/unlockImage"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:src="@drawable/unlock"
+            android:scaleType="fitCenter" />
+
+        <!-- Unlock text -->
+        <TextView
+            android:id="@+id/unlockText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔓 ロック解除！"
+            android:textSize="28sp"
+            android:textColor="#FFD700"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4" />
+
+    </LinearLayout>
+
+</FrameLayout>

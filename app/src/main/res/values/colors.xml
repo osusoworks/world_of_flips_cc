@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- PopButton Colors -->
+    <color name="pop_pink">#FFF06292</color>
+    <color name="pop_pink_shadow">#FFC2185B</color>
+
+    <color name="pop_blue">#FF4FC3F7</color>
+    <color name="pop_blue_shadow">#FF0288D1</color>
+
+    <color name="pop_yellow">#FFFFF176</color>
+    <color name="pop_yellow_shadow">#FFFBC02D</color>
+
+    <color name="pop_green">#FF81C784</color>
+    <color name="pop_green_shadow">#FF388E3C</color>
+
+    <color name="title_pink">#FF96B5</color>
+    <color name="title_blue">#96D8E2</color>
+    <color name="title_yellow">#FFE173</color>
+    <color name="title_green">#9FE2C4</color>
+</resources>

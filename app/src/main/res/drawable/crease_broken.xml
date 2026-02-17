@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1080dp"
+    android:height="1920dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1920">
+
+    <!-- Main Ink Leak / Blob (Black) -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="
+            M0,850
+            L450,850
+            C600,850 650,500 850,500
+            L1080,500
+            L1080,1420
+            C850,1420 600,1070 450,1070
+            L0,1070
+            Z" />
+
+    <!-- Irregularities / Drips -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="
+            M850,500
+            Q820,450 850,400
+            Q880,450 850,500
+            Z
+            M900,1420
+            Q920,1480 900,1520
+            Q880,1480 900,1420
+            Z" />
+</vector>

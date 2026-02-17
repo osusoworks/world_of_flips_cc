@@ -1,0 +1,1 @@
+"C:\Program Files\Java\jdk-17.0.14+7\bin\keytool.exe" -genkey -v -keystore release-key.jks -alias key0 -keyalg RSA -keysize 2048 -validity 10000 -storepass password -keypass password -dname "CN=User, O=WorldOfFlips, C=JP" > output.txt 2>&1

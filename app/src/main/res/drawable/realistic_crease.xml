@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base Layer: 60-70% opacity black, center gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="90"
+                android:startColor="#00000000"
+                android:centerColor="#B3000000"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+
+    <!-- Top Highlight: 1-2px, white, 15-20% opacity -->
+    <item android:gravity="top">
+        <shape android:shape="rectangle">
+            <solid android:color="#33FFFFFF" />
+            <size android:height="2dp" />
+        </shape>
+    </item>
+
+    <!-- Bottom Highlight: 1-2px, white, 15-20% opacity -->
+    <item android:gravity="bottom">
+        <shape android:shape="rectangle">
+            <solid android:color="#33FFFFFF" />
+            <size android:height="2dp" />
+        </shape>
+    </item>
+</layer-list>

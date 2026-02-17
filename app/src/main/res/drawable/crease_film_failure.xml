@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1080dp"
+    android:height="1920dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1920">
+
+    <!-- Large central bubble -->
+    <path
+        android:fillColor="#33FFFFFF"
+        android:pathData="M 490,960 A 100,80 0 1,1 690,960 A 100,80 0 1,1 490,960 Z"/>
+
+    <!-- Top-left bubble -->
+    <path
+        android:fillColor="#26FFFFFF"
+        android:pathData="M 200,350 C 150,300 300,250 350,300 S 450,450 350,450 S 250,400 200,350 Z"/>
+
+    <!-- Mid-left bubble -->
+    <path
+        android:fillColor="#30FFFFFF"
+        android:pathData="M 120,700 C 70,650 220,650 270,700 S 320,850 220,850 S 170,750 120,700 Z"/>
+
+    <!-- Small bubble near top right -->
+    <path
+        android:fillColor="#20FFFFFF"
+        android:pathData="M 850,400 A 40,50 0 1,1 930,400 A 40,50 0 1,1 850,400 Z"/>
+        
+    <!-- Dust speckles -->
+    <path
+        android:fillColor="#7AFFFFFF"
+        android:pathData="M540,960m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"/>
+    <path
+        android:fillColor="#7AFFFFFF"
+        android:pathData="M590,920m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"/>
+    <path
+        android:fillColor="#7AFFFFFF"
+        android:pathData="M250,380m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"/>
+    <path
+        android:fillColor="#7AFFFFFF"
+        android:pathData="M260,385m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"/>
+    <path
+        android:fillColor="#7AFFFFFF"
+        android:pathData="M880,420m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0"/>
+
+</vector>

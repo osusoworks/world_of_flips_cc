@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="1080dp"
+    android:height="1920dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1920">
+
+    <!-- Radial Fracture Lines -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="
+            M600,800 L120,0
+            M600,800 L300,0
+            M600,800 L450,0
+            M600,800 L650,0
+            M600,800 L880,0
+            M600,800 L1080,150
+            M600,800 L1080,400
+            M600,800 L1080,700
+            M600,800 L1080,1100
+            M600,800 L1080,1600
+            M600,800 L900,1920
+            M600,800 L650,1920
+            M600,800 L400,1920
+            M600,800 L150,1920
+            M600,800 L0,1700
+            M600,800 L0,1300
+            M600,800 L0,900
+            M600,800 L0,500
+            M600,800 L0,200
+        " />
+
+    <!-- Spiderweb / Concentric Cracks (Jagged) -->
+    <path
+        android:strokeColor="#D9FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="
+            M300,400 L400,350 L500,420 L650,380 L750,450
+            M220,550 L380,500 L550,600 L720,550 L880,620 L950,580
+            M150,700 L300,650 L450,750 L600,700 L800,750 L1000,700
+            M100,250 L250,200 L400,300 L600,250 L800,300 L1000,250
+            M50,1000 L250,950 L500,1050 L750,950 L1000,1050
+            M100,1300 L300,1200 L500,1350 L700,1250 L900,1350
+            M300,1600 L500,1550 L700,1650 L800,1600
+            M450,600 L470,650 L500,620 L530,670 L550,600
+            M650,850 L680,900 L720,860 L750,920
+            M550,950 L520,1000 L580,1020 L600,980
+        " />
+
+    <!-- Finer details and shards -->
+    <path
+        android:strokeColor="#80FFFFFF"
+        android:strokeWidth="0.8"
+        android:strokeLineCap="square"
+        android:pathData="
+            M600,800 L580,780 L620,770 L600,800
+            M600,800 L610,820 L590,830 L600,800
+            M600,800 L630,810 L640,790
+            M200,300 L250,350
+            M800,500 L850,550
+            M400,1200 L450,1250
+            M900,1000 L950,1050
+        " />
+
+</vector>

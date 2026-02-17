@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" tools:context=".MainActivity">
+
+    <ImageView android:id="@+id/backgroundImageView" android:layout_width="427dp" android:layout_height="737dp" android:scaleType="centerCrop" android:src="@drawable/main_background_v2" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView android:id="@+id/characterImageView" android:layout_width="0dp" android:layout_height="0dp" android:elevation="1dp" android:scaleType="fitCenter" android:visibility="invisible" android:src="@drawable/main_character" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintHeight_percent="0.75" app:layout_constraintStart_toStartOf="parent" app:layout_constraintWidth_percent="0.75" />
+
+    <TextView
+        android:id="@+id/suspiciousText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="・・・・・・。"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:elevation="101dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline android:id="@+id/guideline" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" app:layout_constraintGuide_percent="0.35" />
+
+    <ScrollView android:id="@+id/menuScrollView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="16dp" android:layout_marginBottom="80dp" app:layout_constrainedHeight="true" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toBottomOf="@id/guideline" app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_horizontal" android:orientation="vertical">
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:text="今日はどの折り目？" android:textColor="#FF4081" android:textSize="16sp" android:textStyle="bold" />
+
+            <RadioGroup android:id="@+id/creaseRadioGroup" android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+                <RadioButton android:id="@+id/radioStandard" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text="い つ も の" android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioWhite" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text="白いスレ傷" android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioRGB" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text=" R G B " android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioBroken" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text="液晶漏れ" android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioDouble" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text="W" android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioCracked" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text="落としちゃった・・・" android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioTriFlip" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text=" T r i F l i p " android:textColor="#FFFFFF" android:textStyle="bold" />
+
+                <RadioButton android:id="@+id/radioFilmFail" android:layout_width="200dp" android:layout_height="wrap_content" android:layout_marginBottom="16dp" android:background="@drawable/bg_purple_button_selector" android:button="@null" android:gravity="center" android:padding="12dp" android:text="フィルム失敗！" android:textColor="#FFFFFF" android:textStyle="bold" />
+
+            </RadioGroup>
+
+
+            <Button android:id="@+id/btnBackToTitle" android:layout_width="180dp" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/bg_purple_button_selector" android:padding="12dp" android:text="タイトルに戻る" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout android:id="@+id/bottomControlsLayout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginStart="24dp" android:layout_marginBottom="60dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent">
+
+    </LinearLayout>
+
+    <!-- Unlock effect overlay -->
+    <include layout="@layout/layout_unlock_overlay" />
+
+    <ImageView android:id="@+id/suspiciousOverlay" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" android:elevation="100dp" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintWidth_percent="0.5" app:layout_constraintHeight_percent="0.5" android:scaleType="fitCenter" />
+
+    <!-- Title Screen Overlay -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/titleScreenOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="150dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:id="@+id/titleButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.45"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/randomTitleImage"
+                android:layout_width="wrap_content"
+                android:layout_height="250dp"
+                android:layout_marginBottom="24dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:translationX="60dp"
+                tools:src="@drawable/title_image_1" />
+
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnStart"
+                android:layout_width="260dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="16dp"
+                app:popButtonText="START"
+                app:popButtonColor="@color/pop_pink"
+                app:popShadowColor="@color/pop_pink_shadow"
+                android:rotation="-3" />
+
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnHowToPlay"
+                android:layout_width="260dp"
+                android:layout_height="62dp"
+                android:layout_marginBottom="12dp"
+                app:popButtonText="How to play"
+                app:popButtonColor="@color/pop_blue"
+                app:popShadowColor="@color/pop_blue_shadow"
+                android:rotation="2" />
+
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnSettings"
+                android:layout_width="260dp"
+                android:layout_height="62dp"
+                android:layout_marginBottom="12dp"
+                app:popButtonText="settings"
+                app:popButtonColor="@color/pop_yellow"
+                app:popShadowColor="@color/pop_yellow_shadow"
+                android:rotation="-2" />
+
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnCredit"
+                android:layout_width="260dp"
+                android:layout_height="62dp"
+                app:popButtonText="credit"
+                app:popButtonColor="@color/pop_green"
+                app:popShadowColor="@color/pop_green_shadow"
+                android:rotation="1" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Settings Overlay -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settingsOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="160dp"
+        android:background="#D9000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SETTINGS"
+                android:textColor="#FFFFFF"
+                android:textSize="40sp"
+                android:fontFamily="sans-serif-black"
+                android:layout_marginBottom="48dp"
+                android:shadowColor="#000000"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="8"/>
+
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnSettingsReset"
+                android:layout_width="280dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="24dp"
+                app:popButtonText="Reset Unlocks"
+                app:popButtonColor="@color/pop_pink"
+                app:popShadowColor="@color/pop_pink_shadow"
+                android:rotation="-1"/>
+
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnSettingsBack"
+                android:layout_width="200dp"
+                android:layout_height="56dp"
+                app:popButtonText="Back"
+                app:popButtonColor="@color/pop_blue"
+                app:popShadowColor="@color/pop_blue_shadow"
+                android:rotation="1"/>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Splash Screen Overlay -->
+    <FrameLayout
+        android:id="@+id/splashOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:elevation="200dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/splashLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/splash_logo"
+            android:alpha="0" />
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

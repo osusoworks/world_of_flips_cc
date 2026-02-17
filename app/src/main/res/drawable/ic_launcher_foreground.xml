@@ -1,0 +1,55 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- 折りたたみスマホの本体(グレー) -->
+    <path
+        android:fillColor="#B0B0B0"
+        android:pathData="M35,30 L73,30 L75,85 L33,85 Z" />
+    
+    <!-- 本体の影 -->
+    <path
+        android:fillColor="#909090"
+        android:pathData="M73,30 L75,85 L73,85 L71,30 Z" />
+    
+    <!-- スクリーン(ライトブルー) -->
+    <path
+        android:fillColor="#A8D8EA"
+        android:pathData="M38,35 L70,35 L72,75 L36,75 Z" />
+    
+    <!-- 左目 (>) -->
+    <path
+        android:fillColor="#3D3D3D"
+        android:strokeWidth="2"
+        android:pathData="M46,50 L49,52 L46,54" />
+    
+    <!-- 右目 (<) -->
+    <path
+        android:fillColor="#3D3D3D"
+        android:strokeWidth="2"
+        android:pathData="M62,50 L59,52 L62,54" />
+    
+    <!-- 口 (w) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:strokeColor="#3D3D3D"
+        android:strokeWidth="1.5"
+        android:pathData="M48,58 Q50,60 52,58 Q54,60 56,58 Q58,60 60,58" />
+    
+    <!-- ボタン1 -->
+    <path
+        android:fillColor="#3D3D3D"
+        android:pathData="M 50,78 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
+    
+    <!-- ボタン2 -->
+    <path
+        android:fillColor="#3D3D3D"
+        android:pathData="M 58,78 m -2.5,0 a 2.5,2.5 0 1,0 5,0 a 2.5,2.5 0 1,0 -5,0" />
+    
+    <!-- 下部の折り目 -->
+    <path
+        android:fillColor="#C0C0C0"
+        android:pathData="M35,82 L73,82 L73,85 L35,85 Z" />
+</vector>

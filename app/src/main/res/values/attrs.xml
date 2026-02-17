@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PopButton">
+        <attr name="popButtonText" format="string" />
+        <attr name="popButtonColor" format="color" />
+        <attr name="popShadowColor" format="color" />
+    </declare-styleable>
+</resources>
