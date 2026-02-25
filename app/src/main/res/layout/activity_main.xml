@@ -181,7 +181,7 @@
                 android:layout_width="280dp"
                 android:layout_height="70dp"
                 android:layout_marginBottom="24dp"
-                app:popButtonText="Reset Unlocks"
+                app:popButtonText="アンロックをリセット"
                 app:popButtonColor="@color/pop_pink"
                 app:popShadowColor="@color/pop_pink_shadow"
                 android:rotation="-1"/>
@@ -190,7 +190,7 @@
                 android:id="@+id/btnSettingsBack"
                 android:layout_width="200dp"
                 android:layout_height="56dp"
-                app:popButtonText="Back"
+                app:popButtonText="もどる"
                 app:popButtonColor="@color/pop_blue"
                 app:popShadowColor="@color/pop_blue_shadow"
                 android:rotation="1"/>

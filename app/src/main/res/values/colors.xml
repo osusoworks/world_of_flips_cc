@@ -25,4 +25,6 @@
     <color name="title_blue">#96D8E2</color>
     <color name="title_yellow">#FFE173</color>
     <color name="title_green">#9FE2C4</color>
+    <color name="quiz_background">#000000</color>
+    <color name="quiz_text_color">#FFFFFFFF</color>
 </resources>

@@ -6,21 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".HowToPlayActivity">
 
-    <ImageView
-        android:id="@+id/backgroundImageView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/dark_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:id="@+id/backgroundLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="24dp"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginTop="80dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -43,15 +40,6 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:lineSpacingMultiplier="1.2"
-                android:text="折りたたみスマホに生じる「折り目」を、あなたの折りたためないスマホで再現！"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:text="何をするの？"
                 android:textColor="#FFFFFF"
@@ -61,46 +49,18 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="24dp"
                 android:lineSpacingMultiplier="1.2"
-                android:text="いろんな方法で折り目を「開いて」いこう。"
+                android:text="折り畳みスマホを使い込むと出現する「折り目」を画面に表示させるのが主な機能です。\nあなたの折り畳めないスマホもこれで折り畳みスマホになります。\n\nそう、このアプリはそんな最高の折り目体験を目指して開発されました。"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:lineSpacingMultiplier="1.5"
-                android:paddingStart="16dp"
-                android:text="・クイズに正解\n・ミニゲームクリア\n・その他いろいろ…"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
-                android:text="すべての折り目が消えたら、あなたの勝ち！"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="ご注意"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:lineSpacingMultiplier="1.2"
-                android:text="このアプリは何の役にも立ちません。"
+                android:text="誰かが言いました。\n「折り目は常にそこにあるもの」と。\nSNSを見ていても、カメラを起動しても、メッセンジャーアプリを使っても、折り目は存在するのです。\n\nこのアプリをインストールしたあなたは、スマホを操作するとき常にその存在を感じることができます。\nそれがこのアプリの意義です。\n\nこれをどう楽しむかはあなた次第です。"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
@@ -109,21 +69,19 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
                 android:lineSpacingMultiplier="1.2"
-                android:text="折りたたみスマホが低価格化した今、完全に出遅れたこのアプリを存分にお楽しみください。"
+                android:text="おっと、忘れてました。\n最初はひとつしか選択できません。\n他の折り目（折り目じゃないものもありますが）はいずれかの方法でアンロックされますよ・・・・・"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
-            <Button
+            <com.worldofflips.app.PopButton
                 android:id="@+id/btnBack"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="70dp"
                 android:layout_marginHorizontal="40dp"
-                android:background="@drawable/bg_purple_button_selector"
-                android:padding="12dp"
-                android:text="もどる"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                app:popButtonText="もどる"
+                app:popButtonColor="@color/pop_blue"
+                app:popShadowColor="@color/pop_blue_shadow"
+                android:rotation="-1" />
 
         </LinearLayout>
     </ScrollView>
