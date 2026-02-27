@@ -20,12 +20,16 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
-import com.google.android.material.snackbar.Snackbar
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(ContextUtils.updateContext(newBase))
+    }
 
     private lateinit var creaseRadioGroup: RadioGroup
     private var selectedCreaseType = "standard"
@@ -61,7 +65,7 @@ class MainActivity : AppCompatActivity() {
     private val unlockChallengeLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                     unlockCrease(pendingUnlockId)
+                    unlockCrease(pendingUnlockId)
                 } else {
                     // Canceled or failed
                     creaseRadioGroup.clearCheck()
@@ -174,24 +178,14 @@ class MainActivity : AppCompatActivity() {
                             suspiciousOverlay.setImageResource(R.drawable.suspicious_1)
                             suspiciousOverlay.visibility = View.VISIBLE
                             Snackbar.make(view, "・・・・・・。", Snackbar.LENGTH_SHORT).show()
-                            handler.postDelayed(
-                                    {
-                                        suspiciousOverlay.visibility = View.GONE
-                                    },
-                                    200
-                            )
+                            handler.postDelayed({ suspiciousOverlay.visibility = View.GONE }, 200)
                         }
                         16 -> {
                             // 画像2、「・・・・！？」をSnackbarで表示
                             suspiciousOverlay.setImageResource(R.drawable.suspicious_2)
                             suspiciousOverlay.visibility = View.VISIBLE
                             Snackbar.make(view, "・・・・！？", Snackbar.LENGTH_SHORT).show()
-                            handler.postDelayed(
-                                    {
-                                        suspiciousOverlay.visibility = View.GONE
-                                    },
-                                    1000
-                            )
+                            handler.postDelayed({ suspiciousOverlay.visibility = View.GONE }, 1000)
                         }
                         1, in 3..4, in 6..7, in 9..15, in 17..20 -> {
                             // Silent phases
@@ -603,14 +597,10 @@ class MainActivity : AppCompatActivity() {
 
             val mediaPlayer = MediaPlayer.create(this, R.raw.unlockalarm)
             if (mediaPlayer != null) {
-                mediaPlayer.setOnCompletionListener {
-                    it.release()
-                }
+                mediaPlayer.setOnCompletionListener { it.release() }
                 mediaPlayer.start()
                 // Start visual effect 2 seconds after MP3 starts playing
-                Handler(Looper.getMainLooper()).postDelayed({
-                    startVisualEffect()
-                }, 2000)
+                Handler(Looper.getMainLooper()).postDelayed({ startVisualEffect() }, 2000)
             } else {
                 startVisualEffect()
             }
@@ -698,20 +688,21 @@ class MainActivity : AppCompatActivity() {
         val bottomControlsLayout: View = findViewById(R.id.bottomControlsLayout)
 
         // ランダムなタイトル画像を表示
-        val titleImages = listOf(
-            R.drawable.title_image_1,
-            R.drawable.title_image_2,
-            R.drawable.title_image_3,
-            R.drawable.title_image_4,
-            R.drawable.title_image_5,
-            R.drawable.title_image_6,
-            R.drawable.title_image_7,
-            R.drawable.title_image_8,
-            R.drawable.title_image_9,
-            R.drawable.title_image_10,
-            R.drawable.title_image_11,
-            R.drawable.title_image_12
-        )
+        val titleImages =
+                listOf(
+                        R.drawable.title_image_1,
+                        R.drawable.title_image_2,
+                        R.drawable.title_image_3,
+                        R.drawable.title_image_4,
+                        R.drawable.title_image_5,
+                        R.drawable.title_image_6,
+                        R.drawable.title_image_7,
+                        R.drawable.title_image_8,
+                        R.drawable.title_image_9,
+                        R.drawable.title_image_10,
+                        R.drawable.title_image_11,
+                        R.drawable.title_image_12
+                )
         val randomImage = titleImages.random()
         findViewById<ImageView>(R.id.randomTitleImage).setImageResource(randomImage)
 
@@ -746,7 +737,6 @@ class MainActivity : AppCompatActivity() {
                     .start()
         }
 
-        val comingSoon = { Toast.makeText(this, "Coming Soon!", Toast.LENGTH_SHORT).show() }
         btnHowToPlay.setOnClickListener {
             playSe()
             val intent = Intent(this, HowToPlayActivity::class.java)
@@ -759,24 +749,69 @@ class MainActivity : AppCompatActivity() {
             settingsOverlay.visibility = View.VISIBLE
             settingsOverlay.animate().alpha(1f).setDuration(300).start()
         }
-        
-        // Settings Overlay Buttons
+
+        val settingsOverlay: View = findViewById(R.id.settingsOverlay)
+
+        // Init font radios
+        val fontRadioGroup: RadioGroup = findViewById(R.id.fontRadioGroup)
+        val prefs = getSharedPreferences("com.worldofflips.app.prefs", MODE_PRIVATE)
+        when (prefs.getString("font_selection", "default")) {
+            "yomogi" -> fontRadioGroup.check(R.id.fontYomogi)
+            "mplus" -> fontRadioGroup.check(R.id.fontMplus)
+            else -> fontRadioGroup.check(R.id.fontDefault)
+        }
+        fontRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            val selection =
+                    when (checkedId) {
+                        R.id.fontYomogi -> "yomogi"
+                        R.id.fontMplus -> "mplus"
+                        else -> "default"
+                    }
+            if (prefs.getString("font_selection", "default") != selection) {
+                prefs.edit().putString("font_selection", selection).apply()
+                // Require recreate
+                recreate()
+            }
+        }
+
+        // Init size radios
+        val sizeRadioGroup: RadioGroup = findViewById(R.id.sizeRadioGroup)
+        when (prefs.getString("size_selection", "medium")) {
+            "small" -> sizeRadioGroup.check(R.id.sizeSmall)
+            "large" -> sizeRadioGroup.check(R.id.sizeLarge)
+            else -> sizeRadioGroup.check(R.id.sizeMedium)
+        }
+        sizeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            val selection =
+                    when (checkedId) {
+                        R.id.sizeSmall -> "small"
+                        R.id.sizeLarge -> "large"
+                        else -> "medium"
+                    }
+            if (prefs.getString("size_selection", "medium") != selection) {
+                prefs.edit().putString("size_selection", selection).apply()
+                // Require recreate
+                recreate()
+            }
+        }
+
         val btnSettingsReset: PopButton = findViewById(R.id.btnSettingsReset)
         val btnSettingsBack: PopButton = findViewById(R.id.btnSettingsBack)
-        
+
         btnSettingsReset.setOnClickListener {
             playSe()
             performReset()
         }
-        
+
         btnSettingsBack.setOnClickListener {
             playSe()
             val settingsOverlay: View = findViewById(R.id.settingsOverlay)
-            settingsOverlay.animate()
-                .alpha(0f)
-                .setDuration(300)
-                .withEndAction { settingsOverlay.visibility = View.GONE }
-                .start()
+            settingsOverlay
+                    .animate()
+                    .alpha(0f)
+                    .setDuration(300)
+                    .withEndAction { settingsOverlay.visibility = View.GONE }
+                    .start()
         }
         btnCredit.setOnClickListener {
             playSe()

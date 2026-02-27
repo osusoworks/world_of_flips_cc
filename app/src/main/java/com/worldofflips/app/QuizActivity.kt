@@ -1,6 +1,7 @@
 package com.worldofflips.app
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -8,6 +9,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class QuizActivity : AppCompatActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(ContextUtils.updateContext(newBase))
+    }
+
     private lateinit var questionCountText: TextView
     private lateinit var questionText: TextView
     private lateinit var optionButtons: List<Button>

@@ -17,4 +17,14 @@
         <item name="android:includeFontPadding">false</item>
         <item name="android:windowBackground">@color/white</item>
     </style>
+
+    <style name="Theme.Orimekun.Yomogi" parent="Theme.Orimekun">
+        <item name="fontFamily">@font/yomogi</item>
+        <item name="android:fontFamily">@font/yomogi</item>
+    </style>
+
+    <style name="Theme.Orimekun.Mplus" parent="Theme.Orimekun">
+        <item name="fontFamily">@font/mplusrounded1c</item>
+        <item name="android:fontFamily">@font/mplusrounded1c</item>
+    </style>
 </resources>

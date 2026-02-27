@@ -169,12 +169,133 @@
                 android:text="SETTINGS"
                 android:textColor="#FFFFFF"
                 android:textSize="40sp"
-                android:fontFamily="sans-serif-black"
-                android:layout_marginBottom="48dp"
+                android:layout_marginBottom="32dp"
                 android:shadowColor="#000000"
                 android:shadowDx="4"
                 android:shadowDy="4"
                 android:shadowRadius="8"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="フォント変更"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/fontRadioGroup"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp">
+                
+                <RadioButton
+                    android:id="@+id/fontDefault"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="標準"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/fontYomogi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="ヨモギ"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/fontMplus"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="丸ゴシック"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="サイズ変更"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/sizeRadioGroup"
+                android:layout_width="320dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="32dp">
+
+                <RadioButton
+                    android:id="@+id/sizeSmall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="小"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/sizeMedium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="中"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/sizeLarge"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="大"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </RadioGroup>
 
             <com.worldofflips.app.PopButton
                 android:id="@+id/btnSettingsReset"

@@ -1,7 +1,6 @@
 package com.worldofflips.app
 
 import android.content.Context
-import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -13,6 +12,9 @@ import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 
 class UnlockChallengeActivity : AppCompatActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(ContextUtils.updateContext(newBase))
+    }
 
     private lateinit var timerText: TextView
     private var countDownTimer: CountDownTimer? = null
@@ -26,34 +28,35 @@ class UnlockChallengeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_unlock_challenge)
 
         timerText = findViewById(R.id.timerText)
-        
+
         // Prevent screen sleep
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        
+
         // Setup WakeLock as requested
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Orimekun:UnlockChallenge")
+        wakeLock =
+                powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Orimekun:UnlockChallenge")
     }
 
     override fun onResume() {
         super.onResume()
         // Start/Resume timer
         startTimer()
-        
+
         // Acquire wake lock backup
-        wakeLock?.acquire(TOTAL_TIME + 60000) 
+        wakeLock?.acquire(TOTAL_TIME + 60000)
     }
 
     override fun onPause() {
         super.onPause()
         // Pause timer
         countDownTimer?.cancel()
-        
+
         // If screen is off, reset timer (Challenge failed)
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         if (!pm.isInteractive) {
-             remainingTimeMillis = TOTAL_TIME
-             updateTimerUI(TOTAL_TIME)
+            remainingTimeMillis = TOTAL_TIME
+            updateTimerUI(TOTAL_TIME)
         }
 
         // Release wake lock
@@ -64,23 +67,25 @@ class UnlockChallengeActivity : AppCompatActivity() {
 
     private fun startTimer() {
         countDownTimer?.cancel()
-        
+
         if (remainingTimeMillis <= 0) {
             return
         }
 
-        countDownTimer = object : CountDownTimer(remainingTimeMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                remainingTimeMillis = millisUntilFinished
-                updateTimerUI(millisUntilFinished)
-            }
+        countDownTimer =
+                object : CountDownTimer(remainingTimeMillis, 1000) {
+                            override fun onTick(millisUntilFinished: Long) {
+                                remainingTimeMillis = millisUntilFinished
+                                updateTimerUI(millisUntilFinished)
+                            }
 
-            override fun onFinish() {
-                remainingTimeMillis = 0
-                updateTimerUI(0)
-                performUnlock()
-            }
-        }.start()
+                            override fun onFinish() {
+                                remainingTimeMillis = 0
+                                updateTimerUI(0)
+                                performUnlock()
+                            }
+                        }
+                        .start()
     }
 
     private fun updateTimerUI(millis: Long) {
@@ -108,7 +113,7 @@ class UnlockChallengeActivity : AppCompatActivity() {
         // Set result URL/Data or SharedPrefs
         // We handle unlock logic in MainActivity based on Result or directly here?
         // Let's set the flag directly here to be safe and return OK
-        
+
         val prefs = getSharedPreferences("com.worldofflips.app.prefs", MODE_PRIVATE)
         // Unlock "Double" crease (radioDouble)
         prefs.edit().putBoolean("double_unlocked", true).apply()
@@ -117,10 +122,8 @@ class UnlockChallengeActivity : AppCompatActivity() {
         setResult(RESULT_OK)
 
         // Wait a bit then finish or let user finish?
-        // Prompt says "Unlock complete Snackbar display". 
+        // Prompt says "Unlock complete Snackbar display".
         // Maybe finish after a delay
-        timerText.postDelayed({
-            finish()
-        }, 3000)
+        timerText.postDelayed({ finish() }, 3000)
     }
 }
