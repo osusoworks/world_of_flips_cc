@@ -85,8 +85,6 @@ class MusicService : Service() {
             ACTION_PLAY_NORMAL -> {
                 Log.d(TAG, "ACTION_PLAY_NORMAL received, seekTo: $seekTo")
                 currentMode = MODE_NORMAL
-                // 明示的な再生要求なので、ミュートを解除
-                isMuted = false
 
                 // creasePlayerを停止
                 if (creasePlayer?.isPlaying == true) {
@@ -141,17 +139,13 @@ class MusicService : Service() {
             ACTION_PLAY_CREASE -> {
                 Log.d(TAG, "ACTION_PLAY_CREASE received, seekTo: $seekTo")
                 currentMode = MODE_CREASE
-                // 明示的な再生要求なので、ミュートを解除
-                isMuted = false
 
                 // normalPlayerを停止
                 if (normalPlayer?.isPlaying == true) {
                     normalPlayer?.pause()
                 }
 
-                if (!isMuted) {
-                    playCreaseBgm(seekTo)
-                }
+                playCreaseBgm(seekTo)
             }
             ACTION_TOGGLE_MUTE -> {
                 handleMute(!isMuted)
@@ -183,24 +177,15 @@ class MusicService : Service() {
         isMuted = shouldMute
         Log.d(TAG, "Mute set: $isMuted")
         if (isMuted) {
-            // ミュート時は両方を一時停止
+            // ミュート時はnormalPlayerのみ一時停止
             normalPlayer?.pause()
-            creasePlayer?.pause()
         } else {
             // ミュート解除時は、現在のモードに応じて再生
             try {
-                when (currentMode) {
-                    MODE_NORMAL -> {
-                        if (isNormalPrepared && normalPlayer?.isPlaying == false) {
-                            normalPlayer?.start()
-                            Log.d(TAG, "Resumed normalPlayer after unmute")
-                        }
-                    }
-                    MODE_CREASE -> {
-                        if (isCreasePrepared && creasePlayer?.isPlaying == false) {
-                            creasePlayer?.start()
-                            Log.d(TAG, "Resumed creasePlayer after unmute")
-                        }
+                if (currentMode == MODE_NORMAL) {
+                    if (isNormalPrepared && normalPlayer?.isPlaying == false) {
+                        normalPlayer?.start()
+                        Log.d(TAG, "Resumed normalPlayer after unmute")
                     }
                 }
             } catch (e: Exception) {
@@ -301,7 +286,7 @@ class MusicService : Service() {
                 setOnPreparedListener {
                     isCreasePrepared = true
                     Log.d(TAG, "creasePlayer prepared")
-                    if (pendingPlayCrease && !isMuted) {
+                    if (pendingPlayCrease) {
                         pendingPlayCrease = false
                         it.seekTo(pendingSeekToCrease)
                         it.start()
@@ -333,8 +318,8 @@ class MusicService : Service() {
     }
 
     private fun playCreaseBgm(seekTo: Int) {
-        // モードが変わっている場合やミュートの場合は再生しない
-        if (isMuted || currentMode != MODE_CREASE) return
+        // モードが変わっている場合は再生しない
+        if (currentMode != MODE_CREASE) return
         try {
             // creasePlayerがnullまたは無効な状態の場合は再作成
             if (creasePlayer == null) {

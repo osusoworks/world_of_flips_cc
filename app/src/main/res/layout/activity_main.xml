@@ -89,15 +89,39 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <ImageView
-                android:id="@+id/randomTitleImage"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
-                android:layout_height="250dp"
-                android:layout_marginBottom="24dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                android:translationX="60dp"
-                tools:src="@drawable/title_image_1" />
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+
+                <ImageView
+                    android:id="@+id/randomTitleImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="250dp"
+                    android:layout_marginBottom="24dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:translationX="60dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:src="@drawable/title_image_1" />
+
+                <ImageButton
+                    android:id="@+id/btnBgmToggle"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:padding="8dp"
+                    android:background="@drawable/bg_purple_button_selector"
+                    android:src="@drawable/ic_bgm_on"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginBottom="16dp"
+                    android:translationX="-24dp" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <com.worldofflips.app.PopButton
                 android:id="@+id/btnStart"
@@ -175,128 +199,6 @@
                 android:shadowDy="4"
                 android:shadowRadius="8"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="フォント変更"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <RadioGroup
-                android:id="@+id/fontRadioGroup"
-                android:layout_width="320dp"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="24dp">
-                
-                <RadioButton
-                    android:id="@+id/fontDefault"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_purple_button_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp"
-                    android:text="標準"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/fontYomogi"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_purple_button_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp"
-                    android:text="ヨモギ"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/fontMplus"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_purple_button_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="丸ゴシック"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </RadioGroup>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="サイズ変更"
-                android:textColor="#FFFFFF"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <RadioGroup
-                android:id="@+id/sizeRadioGroup"
-                android:layout_width="320dp"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="32dp">
-
-                <RadioButton
-                    android:id="@+id/sizeSmall"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_purple_button_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp"
-                    android:text="小"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/sizeMedium"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_purple_button_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:layout_marginEnd="4dp"
-                    android:text="中"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <RadioButton
-                    android:id="@+id/sizeLarge"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_purple_button_selector"
-                    android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:text="大"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-            </RadioGroup>
-
             <com.worldofflips.app.PopButton
                 android:id="@+id/btnSettingsReset"
                 android:layout_width="280dp"
@@ -305,6 +207,7 @@
                 app:popButtonText="アンロックをリセット"
                 app:popButtonColor="@color/pop_pink"
                 app:popShadowColor="@color/pop_pink_shadow"
+                app:popTextScale="0.7"
                 android:rotation="-1"/>
 
             <com.worldofflips.app.PopButton
@@ -337,5 +240,88 @@
             android:alpha="0" />
 
     </FrameLayout>
+
+    <!-- Overlay Permission Guide Dialog -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/overlayPermissionGuide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="175dp"
+        android:background="#E6000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_permission_dialog"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Warning Icon -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚠️"
+                android:textSize="48sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="権限の設定が必要です"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"
+                android:shadowColor="#80000000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4" />
+
+            <!-- Description -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="このアプリは、他のアプリの上に\n折り目を表示するために\n「他のアプリの上に重ねて表示」\nの権限が必要です。\n\n設定画面から許可してください。"
+                android:textColor="#DDDDDD"
+                android:textSize="15sp"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:layout_marginBottom="28dp" />
+
+            <!-- Open Settings Button -->
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnOpenOverlaySettings"
+                android:layout_width="260dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="12dp"
+                app:popButtonText="設定を開く"
+                app:popButtonColor="@color/pop_pink"
+                app:popShadowColor="@color/pop_pink_shadow"
+                android:rotation="-1" />
+
+            <!-- Later Button -->
+            <com.worldofflips.app.PopButton
+                android:id="@+id/btnOverlayLater"
+                android:layout_width="200dp"
+                android:layout_height="52dp"
+                app:popButtonText="あとで"
+                app:popButtonColor="@color/pop_blue"
+                app:popShadowColor="@color/pop_blue_shadow"
+                android:rotation="1" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

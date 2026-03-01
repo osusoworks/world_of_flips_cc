@@ -15,12 +15,14 @@ import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.android.material.snackbar.Snackbar
@@ -35,13 +37,22 @@ class MainActivity : AppCompatActivity() {
     private var selectedCreaseType = "standard"
     private var isBgmOn = true
 
-    // オーバーレイ権限を要求するためのランチャー
+    // オーバーレイ権限を要求するためのランチャー（折り目選択時）
     private val overlayPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (Settings.canDrawOverlays(this)) {
                     startOverlayService()
                 } else {
                     Toast.makeText(this, "オーバーレイ権限が許可されませんでした", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+    // 起動時の権限案内ダイアログ用ランチャー（ダイアログを閉じるだけ）
+    private val guidePermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (Settings.canDrawOverlays(this)) {
+                    dismissOverlayPermissionGuide()
+                    Toast.makeText(this, "権限が許可されました！", Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -109,6 +120,11 @@ class MainActivity : AppCompatActivity() {
                 }
         )
 
+        // 設定画面から戻ってきた時、権限が取得済みならダイアログを閉じる
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
+            dismissOverlayPermissionGuide()
+        }
+
         val currentIntent = intent
         if (currentIntent?.getBooleanExtra("RESET_APP", false) == true) {
             // フラグをクリアして再度トリガーされないようにする
@@ -143,6 +159,9 @@ class MainActivity : AppCompatActivity() {
         // （Androidシステムスプラッシュ後に表示）
         findViewById<FrameLayout>(R.id.splashOverlay).visibility = View.GONE
         setupTitleScreen()
+
+        // オーバーレイ権限の案内を表示（権限未取得の場合のみ）
+        showOverlayPermissionGuideIfNeeded()
 
         val backgroundImageView: ImageView = findViewById(R.id.backgroundImageView)
         val characterImageView: ImageView = findViewById(R.id.characterImageView)
@@ -260,7 +279,12 @@ class MainActivity : AppCompatActivity() {
                     }
 
             backgroundImageView.setImageResource(R.drawable.dark_background)
-            characterImageView.setImageResource(R.drawable.main_character_dark)
+
+            if (checkedId == R.id.radioRGB && (1..5).random() == 1) {
+                characterImageView.setImageResource(R.drawable.paripi)
+            } else {
+                characterImageView.setImageResource(R.drawable.main_character_dark)
+            }
 
             checkPermissionAndStart()
         }
@@ -352,13 +376,6 @@ class MainActivity : AppCompatActivity() {
                 }
         startService(musicIntent)
 
-        // BGMが再生されるので、ボタンのアイコンを更新 (Force ON logic kept in prefs for consistency, but UI removed)
-        isBgmOn = true
-        getSharedPreferences("com.worldofflips.app.prefs", MODE_PRIVATE)
-                .edit()
-                .putBoolean("bgm_on", true)
-                .apply()
-
         // Activityのボタンを表示 (OverlayServiceのボタンは非表示になったため... wait, OverlayService buttons show/hide
         // based on Activity visibility now)
         findViewById<View>(R.id.bottomControlsLayout).visibility = View.VISIBLE
@@ -379,13 +396,6 @@ class MainActivity : AppCompatActivity() {
                     putExtra(MusicService.EXTRA_SEEK_TO, 300) // 0.3秒から再生
                 }
         startService(musicIntent)
-
-        // Force BGM ON
-        isBgmOn = true
-        getSharedPreferences("com.worldofflips.app.prefs", MODE_PRIVATE)
-                .edit()
-                .putBoolean("bgm_on", true)
-                .apply()
 
         // 次回同じ折り目を選べるようにチェックを外す
         creaseRadioGroup.clearCheck()
@@ -709,6 +719,40 @@ class MainActivity : AppCompatActivity() {
         // BGM開始（タイトル画面で再生）
         startBgm()
 
+        val btnBgmToggle: ImageButton = findViewById(R.id.btnBgmToggle)
+
+        // アイコンの初期化
+        btnBgmToggle.setImageResource(if (isBgmOn) R.drawable.ic_bgm_on else R.drawable.ic_bgm_off)
+
+        btnBgmToggle.setOnClickListener {
+            playSe()
+            isBgmOn = !isBgmOn
+            getSharedPreferences("com.worldofflips.app.prefs", MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("bgm_on", isBgmOn)
+                    .apply()
+
+            btnBgmToggle.setImageResource(
+                    if (isBgmOn) R.drawable.ic_bgm_on else R.drawable.ic_bgm_off
+            )
+
+            val musicIntent =
+                    Intent(this, MusicService::class.java).apply {
+                        if (isBgmOn) {
+                            // Mute解除
+                            action = MusicService.ACTION_SET_MUTE
+                            putExtra(MusicService.EXTRA_IS_MUTED, false)
+                            // 再生のきっかけが再開の可能性があるため明示的に通常BGMを鳴らす指示を出すのもアリですが、
+                            // ACTION_SET_MUTEのサービス側での処理により、MUTE解除なら自動で再開される前提です
+                        } else {
+                            // Mute設定
+                            action = MusicService.ACTION_SET_MUTE
+                            putExtra(MusicService.EXTRA_IS_MUTED, true)
+                        }
+                    }
+            startService(musicIntent)
+        }
+
         // STARTボタン：メニュー画面へ
         btnStart.setOnClickListener {
             playSe()
@@ -752,55 +796,17 @@ class MainActivity : AppCompatActivity() {
 
         val settingsOverlay: View = findViewById(R.id.settingsOverlay)
 
-        // Init font radios
-        val fontRadioGroup: RadioGroup = findViewById(R.id.fontRadioGroup)
-        val prefs = getSharedPreferences("com.worldofflips.app.prefs", MODE_PRIVATE)
-        when (prefs.getString("font_selection", "default")) {
-            "yomogi" -> fontRadioGroup.check(R.id.fontYomogi)
-            "mplus" -> fontRadioGroup.check(R.id.fontMplus)
-            else -> fontRadioGroup.check(R.id.fontDefault)
-        }
-        fontRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val selection =
-                    when (checkedId) {
-                        R.id.fontYomogi -> "yomogi"
-                        R.id.fontMplus -> "mplus"
-                        else -> "default"
-                    }
-            if (prefs.getString("font_selection", "default") != selection) {
-                prefs.edit().putString("font_selection", selection).apply()
-                // Require recreate
-                recreate()
-            }
-        }
-
-        // Init size radios
-        val sizeRadioGroup: RadioGroup = findViewById(R.id.sizeRadioGroup)
-        when (prefs.getString("size_selection", "medium")) {
-            "small" -> sizeRadioGroup.check(R.id.sizeSmall)
-            "large" -> sizeRadioGroup.check(R.id.sizeLarge)
-            else -> sizeRadioGroup.check(R.id.sizeMedium)
-        }
-        sizeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val selection =
-                    when (checkedId) {
-                        R.id.sizeSmall -> "small"
-                        R.id.sizeLarge -> "large"
-                        else -> "medium"
-                    }
-            if (prefs.getString("size_selection", "medium") != selection) {
-                prefs.edit().putString("size_selection", selection).apply()
-                // Require recreate
-                recreate()
-            }
-        }
-
         val btnSettingsReset: PopButton = findViewById(R.id.btnSettingsReset)
         val btnSettingsBack: PopButton = findViewById(R.id.btnSettingsBack)
 
         btnSettingsReset.setOnClickListener {
             playSe()
-            performReset()
+            AlertDialog.Builder(this)
+                    .setTitle("確認")
+                    .setMessage("すべてのアンロック状態をリセットしますか？")
+                    .setPositiveButton("リセット") { _, _ -> performReset() }
+                    .setNegativeButton("キャンセル", null)
+                    .show()
         }
 
         btnSettingsBack.setOnClickListener {
@@ -867,5 +873,43 @@ class MainActivity : AppCompatActivity() {
         updateUiState()
 
         Toast.makeText(this, "ロック状態をリセットしました", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun showOverlayPermissionGuideIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            val guideOverlay: View = findViewById(R.id.overlayPermissionGuide)
+            guideOverlay.alpha = 0f
+            guideOverlay.visibility = View.VISIBLE
+            guideOverlay.animate().alpha(1f).setDuration(400).start()
+
+            // 「設定を開く」ボタン
+            findViewById<PopButton>(R.id.btnOpenOverlaySettings).setOnClickListener {
+                playSe()
+                val intent =
+                        Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:$packageName")
+                        )
+                guidePermissionLauncher.launch(intent)
+            }
+
+            // 「あとで」ボタン
+            findViewById<PopButton>(R.id.btnOverlayLater).setOnClickListener {
+                playSe()
+                dismissOverlayPermissionGuide()
+            }
+        }
+    }
+
+    private fun dismissOverlayPermissionGuide() {
+        val guideOverlay: View = findViewById(R.id.overlayPermissionGuide)
+        if (guideOverlay.visibility == View.VISIBLE) {
+            guideOverlay
+                    .animate()
+                    .alpha(0f)
+                    .setDuration(300)
+                    .withEndAction { guideOverlay.visibility = View.GONE }
+                    .start()
+        }
     }
 }

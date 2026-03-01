@@ -18,8 +18,8 @@ class UnlockChallengeActivity : AppCompatActivity() {
 
     private lateinit var timerText: TextView
     private var countDownTimer: CountDownTimer? = null
-    private var remainingTimeMillis: Long = 3600000 // 1 hour in ms
-    private val TOTAL_TIME = 3600000L
+    private var remainingTimeMillis: Long = 30000 // 30 seconds in ms
+    private val TOTAL_TIME = 30000L
     private var wakeLock: PowerManager.WakeLock? = null
     private var isUnlocked = false
 

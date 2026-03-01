@@ -4,5 +4,6 @@
         <attr name="popButtonText" format="string" />
         <attr name="popButtonColor" format="color" />
         <attr name="popShadowColor" format="color" />
+        <attr name="popTextScale" format="float" />
     </declare-styleable>
 </resources>

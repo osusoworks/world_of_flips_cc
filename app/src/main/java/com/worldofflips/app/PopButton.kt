@@ -37,6 +37,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
 
     var onPressedListener: (() -> Unit)? = null
+    var textScale: Float = 1.0f
 
     private val buttonPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
@@ -58,17 +59,9 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     private val cornerRadius = 30f * resources.displayMetrics.density
 
     init {
-        // 設定されたフォントをSharedPreferencesから読み込む（確実に反映させるため）
+        // デフォルトフォントを設定
         try {
-            val prefs =
-                    context.getSharedPreferences("com.worldofflips.app.prefs", Context.MODE_PRIVATE)
-            val fontResId =
-                    when (prefs.getString("font_selection", "default")) {
-                        "yomogi" -> R.font.yomogi
-                        "mplus" -> R.font.mplusrounded1c
-                        else -> R.font.yusei_magic
-                    }
-            val tf = ResourcesCompat.getFont(context, fontResId)
+            val tf = ResourcesCompat.getFont(context, R.font.yusei_magic)
             textPaint.typeface = tf
             textShadowPaint.typeface = tf
         } catch (e: Exception) {}
@@ -78,6 +71,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
             text = typedArray.getString(R.styleable.PopButton_popButtonText) ?: ""
             buttonColor = typedArray.getColor(R.styleable.PopButton_popButtonColor, buttonColor)
             shadowColor = typedArray.getColor(R.styleable.PopButton_popShadowColor, shadowColor)
+            textScale = typedArray.getFloat(R.styleable.PopButton_popTextScale, 1.0f)
             typedArray.recycle()
         }
         buttonPaint.color = buttonColor
@@ -120,9 +114,8 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         }
         canvas.drawRoundRect(buttonRect, cornerRadius, cornerRadius, buttonPaint)
 
-        // フォントスケールを考慮してテキストサイズを計算
-        val fontScale = resources.configuration.fontScale
-        val textSize = buttonHeight * 0.45f * fontScale
+        // テキストサイズを計算
+        val textSize = buttonHeight * 0.45f * textScale
         textPaint.textSize = textSize
         textShadowPaint.textSize = textSize
 
