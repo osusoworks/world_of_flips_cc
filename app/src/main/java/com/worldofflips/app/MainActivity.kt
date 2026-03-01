@@ -280,8 +280,20 @@ class MainActivity : AppCompatActivity() {
 
             backgroundImageView.setImageResource(R.drawable.dark_background)
 
+            // アンロック数に応じて差分キャラ画像を上から順に解放
+            val unlockCount = listOf(isWhiteUnlocked, isRgbUnlocked, isBrokenUnlocked, isDoubleUnlocked).count { it }
+            val availableDarkChars = mutableListOf<Int>()
+            if (unlockCount >= 1) availableDarkChars.add(R.drawable.main_charactor_dark2)
+            if (unlockCount >= 2) availableDarkChars.add(R.drawable.main_charactor_dark3)
+            if (unlockCount >= 3) availableDarkChars.add(R.drawable.main_charactor_dark4)
+            if (unlockCount >= 4) availableDarkChars.add(R.drawable.main_charactor_dark5)
+
             if (checkedId == R.id.radioRGB && (1..5).random() == 1) {
+                // RGBのイースターエッグ（1/5確率）
                 characterImageView.setImageResource(R.drawable.paripi)
+            } else if (availableDarkChars.isNotEmpty() && (1..10).random() == 1) {
+                // 差分キャラをランダム表示（1/10確率・アンロック数分だけ候補が増える）
+                characterImageView.setImageResource(availableDarkChars.random())
             } else {
                 characterImageView.setImageResource(R.drawable.main_character_dark)
             }
