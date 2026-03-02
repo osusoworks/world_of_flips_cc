@@ -30,7 +30,7 @@ class CrackedScreenDrawable(
 ) : Drawable() {
 
     companion object {
-        const val PATTERN_COUNT = 5
+        const val PATTERN_COUNT = 4
     }
 
     private data class CrackRay(val points: List<PointF>, val width: Float) {
@@ -292,24 +292,7 @@ class CrackedScreenDrawable(
             maxStep = 42f
         ))
 
-        // ── pattern 3: 2点同時衝撃 ────────────────────────────────────────────
-        // 2箇所に独立したクモの巣。落下後に跳ねて2か所が割れたイメージ。
-        3 -> listOf(
-            CrackCluster(
-                ix = screenWidth * 0.28f,
-                iy = screenHeight * 0.28f,
-                rayCount = 10,
-                seed = 99
-            ),
-            CrackCluster(
-                ix = screenWidth * 0.74f,
-                iy = screenHeight * 0.68f,
-                rayCount = 10,
-                seed = 77
-            )
-        )
-
-        // ── pattern 4: 左側面衝撃 ────────────────────────────────────────────
+        // ── pattern 3: 左側面衝撃 ────────────────────────────────────────────
         // 左端への強い衝撃。ジグザグが少なくほぼ直線的な太い亀裂が
         // 右方向（-55°〜55°）に画面を横断する。
         else -> listOf(CrackCluster(
@@ -342,10 +325,6 @@ class CrackedScreenDrawable(
             canvas.drawOval(c.ix - r, c.iy - r, c.ix + r, c.iy + r, impactPaint)
         }
         for (ray in c.crackRays) {
-            crackShadowPaint.strokeWidth = ray.width * 2.8f
-            canvas.drawPath(ray.toPath(), crackShadowPaint)
-        }
-        for (ray in c.crackRays) {
             crackHighlightPaint.strokeWidth = ray.width * 0.6f
             canvas.drawPath(ray.toPath(), crackHighlightPaint)
         }
@@ -354,7 +333,6 @@ class CrackedScreenDrawable(
             canvas.drawPath(path, ringPaint)
         }
         for (line in c.branchLines) {
-            canvas.drawLine(line[0], line[1], line[2], line[3], branchShadowPaint)
             canvas.drawLine(line[0], line[1], line[2], line[3], branchHighlightPaint)
         }
         for (line in c.glassTexture) {
