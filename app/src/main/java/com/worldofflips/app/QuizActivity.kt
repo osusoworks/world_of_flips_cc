@@ -40,8 +40,8 @@ class QuizActivity : AppCompatActivity() {
         // Save default tint
         defaultButtonTint = optionButtons[0].backgroundTintList
 
-        // ランダムに5問選択
-        selectedQuestions = QuizData.allQuestions.shuffled().take(5)
+        // ランダムに1問選択
+        selectedQuestions = QuizData.allQuestions.shuffled().take(1)
 
         showQuestion()
     }
@@ -53,7 +53,7 @@ class QuizActivity : AppCompatActivity() {
         }
 
         val q = selectedQuestions[currentQuestionIndex]
-        questionCountText.text = "Question ${currentQuestionIndex + 1}/5"
+        questionCountText.text = "Question 1/1"
         questionText.text = q.text
 
         // 選択肢の配置をシャッフルするためのインデックスリスト
@@ -100,25 +100,20 @@ class QuizActivity : AppCompatActivity() {
         // 結果を確認する時間を設けるため2秒待機
         questionText.postDelayed(
                 {
-                    if (incorrectCount >= 4) {
-                        finishQuiz()
-                    } else {
-                        currentQuestionIndex++
-                        showQuestion()
-                    }
+                    currentQuestionIndex++
+                    showQuestion()
                 },
                 2000
         )
     }
 
     private fun finishQuiz() {
-        if (correctCount >= 4) { // 5問中4問以上で合格
+        if (correctCount >= 1) { // 1問正解で合格
             setResult(Activity.RESULT_OK)
             Toast.makeText(this, "クイズ突破！ロック解除！", Toast.LENGTH_LONG).show()
         } else {
             setResult(Activity.RESULT_CANCELED)
-            Toast.makeText(this, "残念... (${correctCount}/5問正解). 4問以上で合格です。", Toast.LENGTH_LONG)
-                    .show()
+            Toast.makeText(this, "残念... もう一度挑戦してみよう！", Toast.LENGTH_LONG).show()
         }
         finish()
     }

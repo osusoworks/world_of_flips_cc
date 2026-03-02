@@ -59,7 +59,10 @@ class MainActivity : AppCompatActivity() {
     private var isWhiteUnlocked = false
     private var isRgbUnlocked = false
     private var isBrokenUnlocked = false
-    private var isDoubleUnlocked = false // New
+    private var isDoubleUnlocked = false
+    private var isCrackedUnlocked = false
+    private var isTriFlipUnlocked = false
+    private var isFilmFailUnlocked = false
     private var brokenUnlockTapCount = 0
     private var pendingUnlockId = -1
 
@@ -265,6 +268,24 @@ class MainActivity : AppCompatActivity() {
                 unlockChallengeLauncher.launch(intent)
                 return@setOnCheckedChangeListener
             }
+            if (checkedId == R.id.radioCracked && !isCrackedUnlocked) {
+                pendingUnlockId = checkedId
+                val intent = Intent(this, QuizActivity::class.java)
+                quizLauncher.launch(intent)
+                return@setOnCheckedChangeListener
+            }
+            if (checkedId == R.id.radioTriFlip && !isTriFlipUnlocked) {
+                pendingUnlockId = checkedId
+                val intent = Intent(this, QuizActivity::class.java)
+                quizLauncher.launch(intent)
+                return@setOnCheckedChangeListener
+            }
+            if (checkedId == R.id.radioFilmFail && !isFilmFailUnlocked) {
+                pendingUnlockId = checkedId
+                val intent = Intent(this, QuizActivity::class.java)
+                quizLauncher.launch(intent)
+                return@setOnCheckedChangeListener
+            }
             selectedCreaseType =
                     when (checkedId) {
                         R.id.radioStandard -> "standard"
@@ -450,7 +471,10 @@ class MainActivity : AppCompatActivity() {
         isWhiteUnlocked = prefs.getBoolean("white_unlocked", false)
         isRgbUnlocked = prefs.getBoolean("rgb_unlocked", false)
         isBrokenUnlocked = prefs.getBoolean("broken_unlocked", false)
-        isDoubleUnlocked = prefs.getBoolean("double_unlocked", false) // Load
+        isDoubleUnlocked = prefs.getBoolean("double_unlocked", false)
+        isCrackedUnlocked = prefs.getBoolean("cracked_unlocked", false)
+        isTriFlipUnlocked = prefs.getBoolean("triflip_unlocked", false)
+        isFilmFailUnlocked = prefs.getBoolean("filmfail_unlocked", false)
 
         for (i in 0 until creaseRadioGroup.childCount) {
             val view = creaseRadioGroup.getChildAt(i)
@@ -496,8 +520,19 @@ class MainActivity : AppCompatActivity() {
                         }
                         view.isEnabled = true
                     }
+                    R.id.radioCracked -> {
+                        view.text = if (isCrackedUnlocked) "落としちゃった・・・" else "? ? ?"
+                        view.isEnabled = true
+                    }
+                    R.id.radioTriFlip -> {
+                        view.text = if (isTriFlipUnlocked) "TriFlip" else "? ? ?"
+                        view.isEnabled = true
+                    }
+                    R.id.radioFilmFail -> {
+                        view.text = if (isFilmFailUnlocked) "フィルム失敗！" else "? ? ?"
+                        view.isEnabled = true
+                    }
                     else -> {
-                        // それ以下: 全部ロック
                         view.text = "? ? ?"
                         view.isEnabled = false
                     }
@@ -671,6 +706,27 @@ class MainActivity : AppCompatActivity() {
                 findViewById<RadioButton>(R.id.radioDouble).text = "二重映り"
                 creaseRadioGroup.clearCheck()
                 creaseRadioGroup.check(R.id.radioDouble)
+            }
+            R.id.radioCracked -> {
+                isCrackedUnlocked = true
+                editor.putBoolean("cracked_unlocked", true)
+                findViewById<RadioButton>(R.id.radioCracked).text = "落としちゃった・・・"
+                creaseRadioGroup.clearCheck()
+                creaseRadioGroup.check(R.id.radioCracked)
+            }
+            R.id.radioTriFlip -> {
+                isTriFlipUnlocked = true
+                editor.putBoolean("triflip_unlocked", true)
+                findViewById<RadioButton>(R.id.radioTriFlip).text = "TriFlip"
+                creaseRadioGroup.clearCheck()
+                creaseRadioGroup.check(R.id.radioTriFlip)
+            }
+            R.id.radioFilmFail -> {
+                isFilmFailUnlocked = true
+                editor.putBoolean("filmfail_unlocked", true)
+                findViewById<RadioButton>(R.id.radioFilmFail).text = "フィルム失敗！"
+                creaseRadioGroup.clearCheck()
+                creaseRadioGroup.check(R.id.radioFilmFail)
             }
         }
         editor.apply()
@@ -883,12 +939,18 @@ class MainActivity : AppCompatActivity() {
                 .putBoolean("rgb_unlocked", false)
                 .putBoolean("broken_unlocked", false)
                 .putBoolean("double_unlocked", false)
+                .putBoolean("cracked_unlocked", false)
+                .putBoolean("triflip_unlocked", false)
+                .putBoolean("filmfail_unlocked", false)
                 .apply()
 
         isWhiteUnlocked = false
         isRgbUnlocked = false
         isBrokenUnlocked = false
         isDoubleUnlocked = false
+        isCrackedUnlocked = false
+        isTriFlipUnlocked = false
+        isFilmFailUnlocked = false
         brokenUnlockTapCount = 0
         updateUiState()
 
