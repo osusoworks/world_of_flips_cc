@@ -23,6 +23,7 @@ class OverlayService : Service() {
     private var triflipViewTop: View? = null
     private var triflipViewBottom: View? = null
     private var controlsView: View? = null
+    private var crackedPatternIndex = 0
 
     companion object {
         const val CHANNEL_ID = "overlay_channel"
@@ -239,22 +240,30 @@ class OverlayService : Service() {
              // Custom Drawable for RGB
              val drawable = RgbCreaseDrawable(displayMetrics.widthPixels, screenHeight)
              imageView?.setImageDrawable(drawable)
-             
+
              params?.height = WindowManager.LayoutParams.WRAP_CONTENT // Use intrinsic size of drawable (full screen)
+        } else if (type == "cracked") {
+            // Custom Drawable for cracked screen — ボタンを押すたびにパターンをサイクル
+            val drawable = CrackedScreenDrawable(
+                displayMetrics.widthPixels,
+                screenHeight,
+                crackedPatternIndex % CrackedScreenDrawable.PATTERN_COUNT
+            )
+            crackedPatternIndex++
+            imageView?.setImageDrawable(drawable)
+            params?.height = WindowManager.LayoutParams.WRAP_CONTENT
         } else {
              val resourceId =
                 when (type) {
                     "white" -> R.drawable.crease_white
-                    // "rgb" handled above
                     "broken" -> R.drawable.crease_broken
                     "double" -> R.drawable.crease_double
-                    "cracked" -> R.drawable.crease_cracked
                     "film_fail" -> R.drawable.crease_film_failure
                     else -> R.drawable.crease_standard
                 }
             imageView?.setImageResource(resourceId)
 
-             if (type == "broken" || type == "cracked" || type == "film_fail") {
+             if (type == "broken" || type == "film_fail") {
                 params?.height = WindowManager.LayoutParams.WRAP_CONTENT
             } else {
                 params?.height = (resources.displayMetrics.density * 8).toInt()
