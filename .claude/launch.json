@@ -3,26 +3,26 @@
   "configurations": [
     {
       "name": "Build Debug APK",
-      "runtimeExecutable": "./gradlew",
-      "runtimeArgs": ["assembleDebug"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "gradlew.bat", "assembleDebug"],
       "port": 5554
     },
     {
       "name": "Install Debug (Device/Emulator)",
-      "runtimeExecutable": "./gradlew",
-      "runtimeArgs": ["installDebug"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "gradlew.bat", "installDebug"],
       "port": 5554
     },
     {
       "name": "Run Unit Tests",
-      "runtimeExecutable": "./gradlew",
-      "runtimeArgs": ["testDebugUnitTest"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "gradlew.bat", "testDebugUnitTest"],
       "port": 5554
     },
     {
       "name": "Build & Install Debug",
-      "runtimeExecutable": "./gradlew",
-      "runtimeArgs": ["clean", "installDebug"],
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "gradlew.bat", "clean", "installDebug"],
       "port": 5554
     }
   ]
