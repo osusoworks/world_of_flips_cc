@@ -311,7 +311,6 @@ class CrackedScreenDrawable(
 
     // ── 描画 ─────────────────────────────────────────────────────────────────
     override fun draw(canvas: Canvas) {
-        canvas.drawRect(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat(), overlayPaint)
         for (c in clusters) drawCluster(canvas, c)
     }
 
@@ -319,10 +318,6 @@ class CrackedScreenDrawable(
         for ((path, alpha) in c.shardFills) {
             shardPaint.color = Color.argb(alpha, 0, 0, 0)
             canvas.drawPath(path, shardPaint)
-        }
-        for ((r, a) in listOf(90f to 120, 65f to 165, 42f to 200, 22f to 230)) {
-            impactPaint.color = Color.argb(a, 0, 0, 0)
-            canvas.drawOval(c.ix - r, c.iy - r, c.ix + r, c.iy + r, impactPaint)
         }
         for (ray in c.crackRays) {
             crackHighlightPaint.strokeWidth = ray.width * 0.6f
