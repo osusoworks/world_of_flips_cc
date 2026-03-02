@@ -23,7 +23,7 @@ class OverlayService : Service() {
     private var triflipViewTop: View? = null
     private var triflipViewBottom: View? = null
     private var controlsView: View? = null
-    private var crackedPatternIndex = 0
+    // crackedPatternIndex はサービス再起動後も引き継ぐため SharedPreferences で管理
 
     companion object {
         const val CHANNEL_ID = "overlay_channel"
@@ -244,12 +244,15 @@ class OverlayService : Service() {
              params?.height = WindowManager.LayoutParams.WRAP_CONTENT // Use intrinsic size of drawable (full screen)
         } else if (type == "cracked") {
             // Custom Drawable for cracked screen — ボタンを押すたびにパターンをサイクル
+            // サービス再起動後も引き継ぐため SharedPreferences で管理
+            val prefs = getSharedPreferences("com.worldofflips.app.prefs", android.content.Context.MODE_PRIVATE)
+            val currentIndex = prefs.getInt("cracked_pattern_index", 0)
+            prefs.edit().putInt("cracked_pattern_index", currentIndex + 1).apply()
             val drawable = CrackedScreenDrawable(
                 displayMetrics.widthPixels,
                 screenHeight,
-                crackedPatternIndex % CrackedScreenDrawable.PATTERN_COUNT
+                currentIndex % CrackedScreenDrawable.PATTERN_COUNT
             )
-            crackedPatternIndex++
             imageView?.setImageDrawable(drawable)
             params?.height = WindowManager.LayoutParams.WRAP_CONTENT
         } else {
