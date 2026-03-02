@@ -288,9 +288,17 @@ class MainActivity : AppCompatActivity() {
             if (unlockCount >= 3) availableDarkChars.add(R.drawable.main_charactor_dark4)
             if (unlockCount >= 4) availableDarkChars.add(R.drawable.main_charactor_dark5)
 
+            val isNekoCrease = checkedId in listOf(R.id.radioCracked, R.id.radioTriFlip, R.id.radioFilmFail)
+
             if (checkedId == R.id.radioRGB && (1..5).random() == 1) {
                 // RGBのイースターエッグ（1/5確率）
                 characterImageView.setImageResource(R.drawable.paripi)
+            } else if (isNekoCrease && (1..10).random() == 1) {
+                // 下位折り目レア（1/10確率）：不安ねこ
+                characterImageView.setImageResource(R.drawable.main_neko)
+            } else if (isNekoCrease) {
+                // 下位折り目通常：笑顔ねこ（特典）
+                characterImageView.setImageResource(R.drawable.main_neko_dark)
             } else if (availableDarkChars.isNotEmpty() && (1..10).random() == 1) {
                 // 差分キャラをランダム表示（1/10確率・アンロック数分だけ候補が増える）
                 characterImageView.setImageResource(availableDarkChars.random())
