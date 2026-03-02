@@ -47,7 +47,8 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP_OVERLAY -> {
-                // MainActivityを起動してリセットを通知
+                // オーバーレイを即座に除去してからMainActivityへ通知
+                removeAllViews()
                 val mainActivityIntent =
                         Intent(this, MainActivity::class.java).apply {
                             this.flags =
