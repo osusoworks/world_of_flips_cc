@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PathMeasure
 import android.graphics.PixelFormat
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
@@ -15,259 +16,264 @@ import kotlin.random.Random
 
 class CrackedScreenDrawable(private val screenWidth: Int, private val screenHeight: Int) : Drawable() {
 
-    // 衝撃点（画面やや上・中央右寄り）
     private val impactX = screenWidth * 0.54f
     private val impactY = screenHeight * 0.40f
-
     private val rng = Random(7)
 
-    // 事前生成データ
-    private val mainCrackPaths = mutableListOf<Path>()
-    private val mainCrackWidths = mutableListOf<Float>()
+    // --- データ構造 ---
+    private data class CrackRay(val points: List<PointF>, val width: Float)
+    private val crackRays = mutableListOf<CrackRay>()
     private val ringPaths = mutableListOf<Path>()
-    private val branchLines = mutableListOf<FloatArray>()   // x1, y1, x2, y2
-    private val glassLines = mutableListOf<FloatArray>()    // 中心付近の細かい破片
+    private val branchLines = mutableListOf<FloatArray>()
+    private val shardFills = mutableListOf<Pair<Path, Int>>()   // <パス, アルファ>
+    private val glassTexture = mutableListOf<FloatArray>()
 
-    // ペイント
+    // --- ペイント ---
+    // 全体に薄暗いオーバーレイ
     private val overlayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(45, 0, 0, 0)
+        color = Color.argb(55, 0, 0, 0)
         style = Paint.Style.FILL
     }
-    private val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(110, 0, 0, 0)
+    // シャード（三角破片）塗りつぶし
+    private val shardPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+    }
+    // 亀裂の暗い影
+    private val crackShadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(200, 0, 0, 0)
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
-    private val crackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.WHITE
-        style = Paint.Style.STROKE
-        strokeCap = Paint.Cap.ROUND
-        strokeJoin = Paint.Join.ROUND
-    }
-    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(210, 255, 255, 255)
-        style = Paint.Style.STROKE
-        strokeCap = Paint.Cap.ROUND
-    }
-    private val branchPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(170, 255, 255, 255)
-        style = Paint.Style.STROKE
-        strokeWidth = 1.5f
-        strokeCap = Paint.Cap.ROUND
-    }
-    private val glassPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(130, 255, 255, 255)
-        style = Paint.Style.STROKE
-        strokeWidth = 0.8f
-    }
-    private val centerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.argb(190, 0, 0, 0)
-        style = Paint.Style.FILL
-    }
-    private val centerHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    // 亀裂の白いハイライト
+    private val crackHighlightPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.argb(230, 255, 255, 255)
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+    }
+    // 同心円リング
+    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(200, 255, 255, 255)
+        style = Paint.Style.STROKE
+        strokeCap = Paint.Cap.ROUND
+    }
+    // 衝撃点塗りつぶし
+    private val impactPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
+    }
+    // 中央の細いガラス質感
+    private val glassDetailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.argb(160, 255, 255, 255)
+        style = Paint.Style.STROKE
+        strokeWidth = 0.7f
     }
 
     init {
-        generateMainCracks()
+        generateCrackRays()
+        generateShardFills()
         generateRings()
         generateBranches()
         generateGlassTexture()
     }
 
-    // 放射状亀裂を生成（全方向に16〜18本）
-    private fun generateMainCracks() {
-        // 各方向に均等 + ランダムオフセット
-        val baseCount = 17
-        for (i in 0 until baseCount) {
-            val baseAngle = (i.toFloat() / baseCount) * 360f
-            val angleOffset = (rng.nextFloat() - 0.5f) * (360f / baseCount * 0.6f)
-            val angleDeg = baseAngle + angleOffset
-            val angleRad = Math.toRadians(angleDeg.toDouble()).toFloat()
-
-            val path = buildJaggedCrack(angleRad)
-            mainCrackPaths.add(path)
-            // 幅はランダム（2.5〜5.5）
-            mainCrackWidths.add(2.5f + rng.nextFloat() * 3f)
+    // 放射状亀裂を16本生成（ジグザグ）
+    private fun generateCrackRays() {
+        val count = 16
+        for (i in 0 until count) {
+            val baseAngleDeg = (i.toFloat() / count) * 360f
+            val offsetDeg = (rng.nextFloat() - 0.5f) * (360f / count * 0.5f)
+            val angleRad = Math.toRadians((baseAngleDeg + offsetDeg).toDouble()).toFloat()
+            val pts = buildJaggedRay(angleRad)
+            crackRays.add(CrackRay(pts, 1.8f + rng.nextFloat() * 3.5f))
+        }
+        // 角度順にソート（シャード生成のため）
+        crackRays.sortBy { ray ->
+            atan2(
+                (ray.points.last().y - impactY).toDouble(),
+                (ray.points.last().x - impactX).toDouble()
+            ).toFloat()
         }
     }
 
-    // 衝撃点から外に向かうジグザグ亀裂パス
-    private fun buildJaggedCrack(startAngle: Float): Path {
-        val path = Path()
-        var x = impactX
-        var y = impactY
-        var angle = startAngle
-
-        path.moveTo(x, y)
-
-        val maxDist = maxOf(screenWidth, screenHeight) * 1.3f
+    private fun buildJaggedRay(startAngle: Float): List<PointF> {
+        val pts = mutableListOf<PointF>()
+        var x = impactX; var y = impactY; var angle = startAngle
+        pts.add(PointF(x, y))
         var dist = 0f
-        val stepMin = 40f
-        val stepMax = 90f
-
+        val maxDist = maxOf(screenWidth, screenHeight) * 1.3f
         while (dist < maxDist) {
-            val step = stepMin + rng.nextFloat() * (stepMax - stepMin)
-            // 角度にブレを加えてジグザグ感
-            angle += (rng.nextFloat() - 0.5f) * 0.18f
-
+            val step = 30f + rng.nextFloat() * 65f
+            angle += (rng.nextFloat() - 0.5f) * 0.22f
             x += cos(angle) * step
             y += sin(angle) * step
-            path.lineTo(x, y)
+            pts.add(PointF(x, y))
             dist += step
-
             if (x < -150 || x > screenWidth + 150 || y < -150 || y > screenHeight + 150) break
         }
-        return path
+        return pts
     }
 
-    // 同心円状の亀裂リングを3本生成
+    // 隣接する亀裂レイの間に「黒い三角シャード」を生成
+    private fun generateShardFills() {
+        for (i in crackRays.indices) {
+            val rayA = crackRays[i]
+            val rayB = crackRays[(i + 1) % crackRays.size]
+            val segments = minOf(rayA.points.size, rayB.points.size) - 1
+
+            for (seg in 0 until minOf(segments, 7)) {
+                val progress = seg.toFloat() / 7f
+
+                // 衝撃点に近いほど不透明（真っ黒）、外側は薄く
+                val alpha = ((1f - progress) * 170f + 15f).toInt()
+                    .let { (it * (0.55f + rng.nextFloat() * 0.45f)).toInt() }
+                    .coerceIn(10, 190)
+
+                val path = Path()
+                path.moveTo(rayA.points[seg].x, rayA.points[seg].y)
+                path.lineTo(rayA.points[seg + 1].x, rayA.points[seg + 1].y)
+                val bNext = rayB.points.getOrElse(seg + 1) { rayB.points.last() }
+                val bCur  = rayB.points[seg]
+                path.lineTo(bNext.x, bNext.y)
+                path.lineTo(bCur.x, bCur.y)
+                path.close()
+
+                shardFills.add(Pair(path, alpha))
+            }
+        }
+    }
+
+    // 不規則な同心リング（欠けあり）を4本生成
     private fun generateRings() {
-        for (radius in listOf(70f, 175f, 330f)) {
+        for (radius in listOf(55f, 140f, 270f, 430f)) {
             val path = Path()
-            val segmentCount = 18 + rng.nextInt(6)
-
-            for (i in 0 until segmentCount) {
-                if (rng.nextFloat() < 0.22f) continue  // 22%確率で欠け（リアル感）
-
-                val startAngleDeg = (i.toFloat() / segmentCount) * 360f
-                val endAngleDeg = ((i + 1).toFloat() / segmentCount) * 360f
-
-                val startRad = Math.toRadians(startAngleDeg.toDouble())
-                val endRad = Math.toRadians(endAngleDeg.toDouble())
-                val midRad = (startRad + endRad) / 2
-
-                // 半径にランダム揺らぎ
-                val r1 = radius * (0.85f + rng.nextFloat() * 0.3f)
-                val r2 = radius * (0.85f + rng.nextFloat() * 0.3f)
-                val rMid = radius * (0.85f + rng.nextFloat() * 0.3f)
-
-                val sx = impactX + cos(startRad).toFloat() * r1
-                val sy = impactY + sin(startRad).toFloat() * r1
-                val mx = impactX + cos(midRad).toFloat() * rMid
-                val my = impactY + sin(midRad).toFloat() * rMid
-                val ex = impactX + cos(endRad).toFloat() * r2
-                val ey = impactY + sin(endRad).toFloat() * r2
-
-                path.moveTo(sx, sy)
-                path.lineTo(mx, my)
-                path.lineTo(ex, ey)
+            val segCount = 20 + rng.nextInt(8)
+            for (i in 0 until segCount) {
+                if (rng.nextFloat() < 0.22f) continue
+                val a1 = (i.toFloat() / segCount) * 360f
+                val a2 = ((i + 1).toFloat() / segCount) * 360f
+                val mid = (a1 + a2) / 2f
+                val r1   = radius * (0.82f + rng.nextFloat() * 0.36f)
+                val r2   = radius * (0.82f + rng.nextFloat() * 0.36f)
+                val rMid = radius * (0.78f + rng.nextFloat() * 0.44f)
+                fun toX(a: Double, r: Float) = impactX + cos(Math.toRadians(a)).toFloat() * r
+                fun toY(a: Double, r: Float) = impactY + sin(Math.toRadians(a)).toFloat() * r
+                path.moveTo(toX(a1.toDouble(), r1), toY(a1.toDouble(), r1))
+                path.lineTo(toX(mid.toDouble(), rMid), toY(mid.toDouble(), rMid))
+                path.lineTo(toX(a2.toDouble(), r2), toY(a2.toDouble(), r2))
             }
             ringPaths.add(path)
         }
     }
 
-    // 各主亀裂に枝亀裂を生成
+    // 各亀裂レイから枝亀裂を生成
     private fun generateBranches() {
-        for ((pathIdx, crackPath) in mainCrackPaths.withIndex()) {
-            // パスから点列を近似取得
-            val measure = android.graphics.PathMeasure(crackPath, false)
+        for (ray in crackRays) {
+            val p = ray.toPath()
+            val measure = PathMeasure(p, false)
             val totalLen = measure.length
-            if (totalLen < 100f) continue
-
-            val branchPositions = listOf(0.3f, 0.55f, 0.75f)
-            for (frac in branchPositions) {
-                if (rng.nextFloat() < 0.25f) continue  // たまに省略
-
-                val pos = FloatArray(2)
-                val tan = FloatArray(2)
+            if (totalLen < 80f) continue
+            for (frac in listOf(0.28f, 0.48f, 0.67f, 0.82f)) {
+                if (rng.nextFloat() < 0.35f) continue
+                val pos = FloatArray(2); val tan = FloatArray(2)
                 measure.getPosTan(totalLen * frac, pos, tan)
-
                 val mainAngle = atan2(tan[1].toDouble(), tan[0].toDouble()).toFloat()
                 val side = if (rng.nextBoolean()) 1f else -1f
-                val branchAngle = mainAngle + side * (0.45f + rng.nextFloat() * 0.3f)
-                val branchLen = 50f + rng.nextFloat() * 140f
-
+                val branchAngle = mainAngle + side * (0.42f + rng.nextFloat() * 0.32f)
+                val len = 35f + rng.nextFloat() * 115f
                 branchLines.add(floatArrayOf(
                     pos[0], pos[1],
-                    pos[0] + cos(branchAngle) * branchLen,
-                    pos[1] + sin(branchAngle) * branchLen
+                    pos[0] + cos(branchAngle) * len,
+                    pos[1] + sin(branchAngle) * len
                 ))
-
-                // 枝の枝（小枝）
-                if (rng.nextFloat() < 0.5f) {
-                    val subAngle = branchAngle + (rng.nextFloat() - 0.5f) * 0.5f
-                    val subLen = 25f + rng.nextFloat() * 60f
-                    val subStartFrac = 0.4f + rng.nextFloat() * 0.4f
-                    val subStartX = pos[0] + cos(branchAngle) * branchLen * subStartFrac
-                    val subStartY = pos[1] + sin(branchAngle) * branchLen * subStartFrac
-                    branchLines.add(floatArrayOf(
-                        subStartX, subStartY,
-                        subStartX + cos(subAngle) * subLen,
-                        subStartY + sin(subAngle) * subLen
-                    ))
-                }
             }
         }
     }
 
-    // 衝撃中心付近の細かいガラス破片ライン
+    // 衝撃中心付近の細かいガラス質感ライン
     private fun generateGlassTexture() {
-        for (i in 0..40) {
+        for (i in 0..55) {
             val angle = rng.nextFloat() * 360.0
-            val angleRad = Math.toRadians(angle)
-            val innerDist = 20f + rng.nextFloat() * 35f
-            val outerDist = innerDist + 10f + rng.nextFloat() * 30f
-            glassLines.add(floatArrayOf(
-                impactX + cos(angleRad).toFloat() * innerDist,
-                impactY + sin(angleRad).toFloat() * innerDist,
-                impactX + cos(angleRad).toFloat() * outerDist,
-                impactY + sin(angleRad).toFloat() * outerDist
+            val r1 = 12f + rng.nextFloat() * 40f
+            val r2 = r1 + 6f + rng.nextFloat() * 22f
+            val rad = Math.toRadians(angle)
+            glassTexture.add(floatArrayOf(
+                impactX + cos(rad).toFloat() * r1, impactY + sin(rad).toFloat() * r1,
+                impactX + cos(rad).toFloat() * r2, impactY + sin(rad).toFloat() * r2
             ))
         }
+    }
+
+    private fun CrackRay.toPath(): Path {
+        val p = Path()
+        if (points.isEmpty()) return p
+        p.moveTo(points[0].x, points[0].y)
+        points.drop(1).forEach { p.lineTo(it.x, it.y) }
+        return p
     }
 
     override fun draw(canvas: Canvas) {
         // 1. 全体に薄暗いオーバーレイ
         canvas.drawRect(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat(), overlayPaint)
 
-        // 2. 主亀裂の影（黒縁で深さを表現）
-        for ((i, path) in mainCrackPaths.withIndex()) {
-            shadowPaint.strokeWidth = mainCrackWidths[i] * 2.8f
-            canvas.drawPath(path, shadowPaint)
+        // 2. 三角シャード塗りつぶし（最重要：リアルな割れガラス感）
+        for ((path, alpha) in shardFills) {
+            shardPaint.color = Color.argb(alpha, 0, 0, 0)
+            canvas.drawPath(path, shardPaint)
         }
 
-        // 3. 同心円リング（影）
-        shadowPaint.strokeWidth = 5f
-        for (path in ringPaths) canvas.drawPath(path, shadowPaint)
-
-        // 4. 主亀裂（白）
-        for ((i, path) in mainCrackPaths.withIndex()) {
-            crackPaint.strokeWidth = mainCrackWidths[i]
-            canvas.drawPath(path, crackPaint)
+        // 3. 衝撃点の段階的な暗転（中心に近いほど真っ黒）
+        for ((r, a) in listOf(90f to 120, 65f to 165, 42f to 200, 22f to 230)) {
+            impactPaint.color = Color.argb(a, 0, 0, 0)
+            canvas.drawOval(impactX - r, impactY - r, impactX + r, impactY + r, impactPaint)
         }
 
-        // 5. 同心円リング（白）
+        // 4. 亀裂レイ：太い暗い影
+        for (ray in crackRays) {
+            crackShadowPaint.strokeWidth = ray.width * 2.8f
+            canvas.drawPath(ray.toPath(), crackShadowPaint)
+        }
+        // 5. 亀裂レイ：細い白いハイライト（ガラス端の反射）
+        for (ray in crackRays) {
+            crackHighlightPaint.strokeWidth = ray.width * 0.6f
+            canvas.drawPath(ray.toPath(), crackHighlightPaint)
+        }
+
+        // 6. 同心リング
         for ((i, path) in ringPaths.withIndex()) {
-            ringPaint.strokeWidth = 2.2f - i * 0.5f
+            ringPaint.strokeWidth = (2.8f - i * 0.5f).coerceAtLeast(0.7f)
             canvas.drawPath(path, ringPaint)
         }
 
-        // 6. 枝亀裂
+        // 7. 枝亀裂（影＋ハイライト）
+        val branchShadow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(160, 0, 0, 0)
+            style = Paint.Style.STROKE
+            strokeWidth = 2.8f
+            strokeCap = Paint.Cap.ROUND
+        }
+        val branchHighlight = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(190, 255, 255, 255)
+            style = Paint.Style.STROKE
+            strokeWidth = 1.1f
+            strokeCap = Paint.Cap.ROUND
+        }
         for (line in branchLines) {
-            canvas.drawLine(line[0], line[1], line[2], line[3], branchPaint)
+            canvas.drawLine(line[0], line[1], line[2], line[3], branchShadow)
+            canvas.drawLine(line[0], line[1], line[2], line[3], branchHighlight)
         }
 
-        // 7. 衝撃中心：暗い潰れたエリア
-        canvas.drawOval(
-            impactX - 48f, impactY - 48f,
-            impactX + 48f, impactY + 48f,
-            centerPaint
-        )
-
-        // 8. 中心のガラス細片
-        for (line in glassLines) {
-            canvas.drawLine(line[0], line[1], line[2], line[3], glassPaint)
+        // 8. 中央付近の細かいガラスの質感
+        for (line in glassTexture) {
+            canvas.drawLine(line[0], line[1], line[2], line[3], glassDetailPaint)
         }
 
-        // 9. 衝撃点の白い光（光の反射）
-        canvas.drawOval(
-            impactX - 16f, impactY - 16f,
-            impactX + 16f, impactY + 16f,
-            centerHighlightPaint
-        )
+        // 9. 衝撃点の光る白い核
+        val corePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(210, 255, 255, 255)
+            style = Paint.Style.FILL
+        }
+        canvas.drawOval(impactX - 14f, impactY - 14f, impactX + 14f, impactY + 14f, corePaint)
     }
 
     override fun setAlpha(alpha: Int) {}
