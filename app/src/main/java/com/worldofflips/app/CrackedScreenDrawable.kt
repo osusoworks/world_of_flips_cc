@@ -15,12 +15,13 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 /**
- * 割れ画面エフェクト描画クラス
- * pattern 0: 中央やや右上（スタンダードクモの巣）
- * pattern 1: 右上コーナー落下
- * pattern 2: 下端中央落下
- * pattern 3: 2点同時衝撃
- * pattern 4: 左上寄り・少ないレイ
+ * 割れ画面エフェクト描画クラス（5パターン）
+ *
+ * pattern 0: 中央スタンダード  — 画面中央から全方向に均等なクモの巣
+ * pattern 1: 右上コーナー落下 — 右上角から下・左方向に広がる亀裂
+ * pattern 2: 下端中央落下    — 下端から上方向に密集した細かい亀裂
+ * pattern 3: 2点同時衝撃    — 画面に2箇所のクモの巣
+ * pattern 4: 左側面衝撃     — 左端からほぼ直線的に横断する大きな亀裂
  */
 class CrackedScreenDrawable(
     private val screenWidth: Int,
@@ -32,7 +33,6 @@ class CrackedScreenDrawable(
         const val PATTERN_COUNT = 5
     }
 
-    // CrackRay にメソッドを持たせることでスコープ問題を回避
     private data class CrackRay(val points: List<PointF>, val width: Float) {
         fun toPath(): Path {
             val p = Path()
@@ -94,11 +94,28 @@ class CrackedScreenDrawable(
     }
 
     // ── 1衝撃点のデータを保持するクラス ──────────────────────────────────────
+    /**
+     * @param ix, iy       衝撃点（ピクセル座標）
+     * @param rayCount     放射亀裂の本数
+     * @param seed         乱数シード
+     * @param minAngleDeg  亀裂を生成する角度範囲の開始（null = 全周360°）
+     * @param maxAngleDeg  亀裂を生成する角度範囲の終了
+     * @param jitter       亀裂のジグザグ量（大きいほど曲がりくねる、デフォルト0.22）
+     * @param minStep      亀裂1ステップの最短距離
+     * @param maxStep      亀裂1ステップの最長距離
+     * @param widthScale   亀裂の太さ係数
+     */
     private inner class CrackCluster(
         val ix: Float,
         val iy: Float,
         val rayCount: Int,
-        seed: Int
+        seed: Int,
+        private val minAngleDeg: Float? = null,
+        private val maxAngleDeg: Float? = null,
+        private val jitter: Float = 0.22f,
+        private val minStep: Float = 30f,
+        private val maxStep: Float = 65f,
+        private val widthScale: Float = 1.0f
     ) {
         private val rng = Random(seed)
         val crackRays    = mutableListOf<CrackRay>()
@@ -116,11 +133,15 @@ class CrackedScreenDrawable(
         }
 
         private fun generateCrackRays() {
+            val angleSpan  = if (minAngleDeg != null && maxAngleDeg != null) maxAngleDeg - minAngleDeg else 360f
+            val angleStart = minAngleDeg ?: 0f
+
             for (i in 0 until rayCount) {
-                val baseAngleDeg = (i.toFloat() / rayCount) * 360f
-                val offsetDeg    = (rng.nextFloat() - 0.5f) * (360f / rayCount * 0.5f)
+                val baseAngleDeg = angleStart + (i.toFloat() / rayCount) * angleSpan
+                val offsetDeg    = (rng.nextFloat() - 0.5f) * (angleSpan / rayCount * 0.5f)
                 val angleRad     = Math.toRadians((baseAngleDeg + offsetDeg).toDouble()).toFloat()
-                crackRays.add(CrackRay(buildJaggedRay(angleRad), 1.8f + rng.nextFloat() * 3.5f))
+                val baseWidth    = (1.8f + rng.nextFloat() * 3.5f) * widthScale
+                crackRays.add(CrackRay(buildJaggedRay(angleRad), baseWidth))
             }
             crackRays.sortBy { ray ->
                 atan2(
@@ -135,10 +156,10 @@ class CrackedScreenDrawable(
             var x = ix; var y = iy; var angle = startAngle
             pts.add(PointF(x, y))
             var dist = 0f
-            val maxDist = maxOf(screenWidth, screenHeight) * 1.3f
+            val maxDist = maxOf(screenWidth, screenHeight) * 1.4f
             while (dist < maxDist) {
-                val step = 30f + rng.nextFloat() * 65f
-                angle += (rng.nextFloat() - 0.5f) * 0.22f
+                val step = minStep + rng.nextFloat() * (maxStep - minStep)
+                angle += (rng.nextFloat() - 0.5f) * jitter
                 x += cos(angle) * step
                 y += sin(angle) * step
                 pts.add(PointF(x, y))
@@ -229,67 +250,116 @@ class CrackedScreenDrawable(
         }
     }
 
-    // ── パターン定義（衝撃位置・レイ数・シード） ─────────────────────────────
+    // ── パターン定義 ─────────────────────────────────────────────────────────
     private val clusters: List<CrackCluster> = when (pattern % PATTERN_COUNT) {
-        // pattern 0: 中央やや右上 — スタンダードなクモの巣
-        0 -> listOf(CrackCluster(screenWidth * 0.54f, screenHeight * 0.40f, 16, 7))
-        // pattern 1: 右上コーナー落下 — 左下に広がる亀裂
-        1 -> listOf(CrackCluster(screenWidth * 0.85f, screenHeight * 0.12f, 14, 42))
-        // pattern 2: 下端中央落下 — 上に広がる亀裂
-        2 -> listOf(CrackCluster(screenWidth * 0.50f, screenHeight * 0.88f, 14, 13))
-        // pattern 3: 2点同時衝撃 — 左上と右下に2つのクモの巣
+
+        // ── pattern 0: 中央スタンダード ──────────────────────────────────────
+        // 画面中央やや右上から全方向に16本の亀裂。典型的なクモの巣割れ。
+        0 -> listOf(CrackCluster(
+            ix = screenWidth * 0.54f,
+            iy = screenHeight * 0.40f,
+            rayCount = 16,
+            seed = 7
+        ))
+
+        // ── pattern 1: 右上コーナー落下 ──────────────────────────────────────
+        // 右上コーナーへの落下。亀裂は下〜左方向（100°〜290°）にのみ伸び、
+        // 大きくジグザグして「角が砕けた」感を表現。
+        1 -> listOf(CrackCluster(
+            ix = screenWidth * 0.88f,
+            iy = screenHeight * 0.09f,
+            rayCount = 12,
+            seed = 42,
+            minAngleDeg = 100f,
+            maxAngleDeg = 290f,
+            jitter = 0.38f,
+            minStep = 25f,
+            maxStep = 60f
+        ))
+
+        // ── pattern 2: 下端中央落下 ───────────────────────────────────────────
+        // 下端中央への落下。亀裂は上方向（195°〜345°）にのみ伸び、
+        // 短いステップで細かく密集した亀裂が上へ扇状に広がる。
+        2 -> listOf(CrackCluster(
+            ix = screenWidth * 0.50f,
+            iy = screenHeight * 0.92f,
+            rayCount = 18,
+            seed = 13,
+            minAngleDeg = 195f,
+            maxAngleDeg = 345f,
+            jitter = 0.26f,
+            minStep = 18f,
+            maxStep = 42f
+        ))
+
+        // ── pattern 3: 2点同時衝撃 ────────────────────────────────────────────
+        // 2箇所に独立したクモの巣。落下後に跳ねて2か所が割れたイメージ。
         3 -> listOf(
-            CrackCluster(screenWidth * 0.30f, screenHeight * 0.32f, 10, 99),
-            CrackCluster(screenWidth * 0.68f, screenHeight * 0.62f, 10, 77)
+            CrackCluster(
+                ix = screenWidth * 0.28f,
+                iy = screenHeight * 0.28f,
+                rayCount = 10,
+                seed = 99
+            ),
+            CrackCluster(
+                ix = screenWidth * 0.74f,
+                iy = screenHeight * 0.68f,
+                rayCount = 10,
+                seed = 77
+            )
         )
-        // pattern 4: 左上寄り — 少ないレイで大きなシャード
-        else -> listOf(CrackCluster(screenWidth * 0.18f, screenHeight * 0.22f, 12, 55))
+
+        // ── pattern 4: 左側面衝撃 ────────────────────────────────────────────
+        // 左端への強い衝撃。ジグザグが少なくほぼ直線的な太い亀裂が
+        // 右方向（-55°〜55°）に画面を横断する。
+        else -> listOf(CrackCluster(
+            ix = screenWidth * 0.04f,
+            iy = screenHeight * 0.48f,
+            rayCount = 9,
+            seed = 55,
+            minAngleDeg = -55f,
+            maxAngleDeg = 55f,
+            jitter = 0.09f,
+            minStep = 50f,
+            maxStep = 110f,
+            widthScale = 2.2f
+        ))
     }
 
     // ── 描画 ─────────────────────────────────────────────────────────────────
     override fun draw(canvas: Canvas) {
-        // 1. 全体に薄暗いオーバーレイ
         canvas.drawRect(0f, 0f, screenWidth.toFloat(), screenHeight.toFloat(), overlayPaint)
-        // 各衝撃点クラスターを描画
         for (c in clusters) drawCluster(canvas, c)
     }
 
     private fun drawCluster(canvas: Canvas, c: CrackCluster) {
-        // 2. 三角シャード塗りつぶし
         for ((path, alpha) in c.shardFills) {
             shardPaint.color = Color.argb(alpha, 0, 0, 0)
             canvas.drawPath(path, shardPaint)
         }
-        // 3. 衝撃点の段階的な暗転
         for ((r, a) in listOf(90f to 120, 65f to 165, 42f to 200, 22f to 230)) {
             impactPaint.color = Color.argb(a, 0, 0, 0)
             canvas.drawOval(c.ix - r, c.iy - r, c.ix + r, c.iy + r, impactPaint)
         }
-        // 4. 亀裂レイ：太い暗い影
         for (ray in c.crackRays) {
             crackShadowPaint.strokeWidth = ray.width * 2.8f
             canvas.drawPath(ray.toPath(), crackShadowPaint)
         }
-        // 5. 亀裂レイ：細い白いハイライト
         for (ray in c.crackRays) {
             crackHighlightPaint.strokeWidth = ray.width * 0.6f
             canvas.drawPath(ray.toPath(), crackHighlightPaint)
         }
-        // 6. 同心リング
         for ((i, path) in c.ringPaths.withIndex()) {
             ringPaint.strokeWidth = (2.8f - i * 0.5f).coerceAtLeast(0.7f)
             canvas.drawPath(path, ringPaint)
         }
-        // 7. 枝亀裂（影＋ハイライト）
         for (line in c.branchLines) {
             canvas.drawLine(line[0], line[1], line[2], line[3], branchShadowPaint)
             canvas.drawLine(line[0], line[1], line[2], line[3], branchHighlightPaint)
         }
-        // 8. 中央付近の細かいガラス質感
         for (line in c.glassTexture) {
             canvas.drawLine(line[0], line[1], line[2], line[3], glassDetailPaint)
         }
-        // 9. 衝撃点の光る白い核
         canvas.drawOval(c.ix - 14f, c.iy - 14f, c.ix + 14f, c.iy + 14f, corePaint)
     }
 
